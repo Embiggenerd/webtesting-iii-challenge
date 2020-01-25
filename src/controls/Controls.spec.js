@@ -7,7 +7,7 @@ import Controls from './Controls'
 const funcProps = {
     toggleClosed: jest.fn(),
     toggleLocked: jest.fn(),
-    clearSpies: function(){
+    clearSpies: function(){ // Since we are using a singleton for prop functions, we have to clear between tests
         this.toggleClosed.mockClear()
         this.toggleLocked.mockClear()
     }
@@ -45,18 +45,20 @@ test('close button is clickable but lock button is not with default props', () =
     fireEvent.click(getByTestId('button-close'))
     fireEvent.click(getByTestId('button-lock'))
 
-    expect(defaultProps.toggleClosed).toHaveBeenCalled()
-    expect(defaultProps.toggleLocked).toHaveBeenCalledTimes(0)
+    expect(funcProps.toggleClosed).toHaveBeenCalled()
+    expect(funcProps.toggleLocked).toHaveBeenCalledTimes(0)
 
-    defaultProps.clearSpies()
+    funcProps.clearSpies()
 })
 
-test('lock button is clickable with closed locked props', () => {
+test('lock button is clickable, close it disabled with closed locked props', () => {
     const { getByTestId } = render(<Controls {...closedLockedProps} />)
     
+    fireEvent.click(getByTestId('button-close'))
     fireEvent.click(getByTestId('button-lock'))
 
-    expect(defaultProps.toggleLocked).toHaveBeenCalledTimes(1)
+    expect(funcProps.toggleLocked).toHaveBeenCalledTimes(1)
+    expect(funcProps.toggleClosed).toHaveBeenCalledTimes(0)
 
-    defaultProps.clearSpies()
+    funcProps.clearSpies()
 })
