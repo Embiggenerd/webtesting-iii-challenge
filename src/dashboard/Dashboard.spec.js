@@ -13,16 +13,28 @@ const renderWithRedux = (component, state) => {
 
     return {
         ...render(<Provider store={store}>{component}</Provider>),
-        // adding `store` to the returned utilities to allow us
-        // to reference it in our tests (just try to avoid using
-        // this to test implementation details).
         store,
     }
 }
 
 test('can render with redux with defaults', () => {
-    const { getByTestId, getByText } = renderWithRedux(<Dashboard />, intitialState)
-    // fireEvent.click(getByText('+'))
+    const { getByTestId } = renderWithRedux(<Dashboard />, intitialState)
     expect(getByTestId('display-closed')).toHaveTextContent('Open')
+    expect(getByTestId('display-locked')).toHaveTextContent('Unlocked')
+})
+
+test('clicking toggle buttons in right order changes locked display', () => {
+    const { getByTestId } = renderWithRedux(<Dashboard />, intitialState)
+    fireEvent.click(getByTestId('button-close'))
+    fireEvent.click(getByTestId('button-lock'))
+    expect(getByTestId('display-closed')).toHaveTextContent('Closed')
+    expect(getByTestId('display-locked')).toHaveTextContent('Locked')
+})
+
+test('clicking toggle buttons in wrong order does not change locked display', () => {
+    const { getByTestId } = renderWithRedux(<Dashboard />, intitialState)
+    fireEvent.click(getByTestId('button-lock'))
+    fireEvent.click(getByTestId('button-close'))
+    expect(getByTestId('display-closed')).toHaveTextContent('Closed')
     expect(getByTestId('display-locked')).toHaveTextContent('Unlocked')
 })
