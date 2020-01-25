@@ -1,0 +1,1 @@
+export const initialState = { locked: false, closed: false }
